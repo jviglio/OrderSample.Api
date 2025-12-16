@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.32" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OrderSample.Application\OrderSample.Application.csproj" />
+    <ProjectReference Include="..\OrderSample.Domain\OrderSample.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
