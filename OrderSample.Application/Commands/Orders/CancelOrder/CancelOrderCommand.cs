@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace OrderSample.Application.Orders
+namespace OrderSample.Application.Commands.Orders.CancelOrder
 {
     public class CancelOrderCommand
     {

@@ -1,47 +1,55 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OrderSample.Application.Orders;
+using OrderSample.Application.Commands.Orders.CreateOrder;
+using OrderSample.Application.Commands.Orders.CancelOrder;
 using System;
-using System.Linq;
+using System.Threading.Tasks;
+using OrderSample.Infrastructure.Queries.Orders.GetOrders;
 
 namespace OrderSample.Api.Controllers
 {
-    [ApiController] 
+    [ApiController]
     [Route("orders")]
     public class OrdersController : ControllerBase
     {
-        private readonly OrderService _service;
+        private readonly CreateOrderCommandHandler _createOrderHandler;
+        private readonly CancelOrderCommandHandler _cancelOrderHandler;
+        private readonly GetOrdersQueryHandler _getOrdersHandler;
 
-        public OrdersController(OrderService service)
+        public OrdersController(
+            CreateOrderCommandHandler createOrderHandler,
+            CancelOrderCommandHandler cancelOrderHandler,
+            GetOrdersQueryHandler getOrdersHandler)
         {
-            _service = service;
+            _createOrderHandler = createOrderHandler;
+            _cancelOrderHandler = cancelOrderHandler;
+            _getOrdersHandler = getOrdersHandler;
         }
 
+
         [HttpPost]
-        public IActionResult Create([FromQuery] decimal total)
+        public async Task<IActionResult> Create([FromQuery] decimal total)
         {
-            var id = _service.Create(new CreateOrderCommand(total));
-            return Ok(id);
+            var command = new CreateOrderCommand(total);
+            var id = await _createOrderHandler.Handle(command);
+
+            return CreatedAtAction(nameof(Create), new { id }, null);
         }
 
         [HttpPost("{id}/cancel")]
-        public IActionResult Cancel(Guid id)
+        public async Task<IActionResult> Cancel(Guid id)
         {
-            _service.Cancel(new CancelOrderCommand(id));
+            var command = new CancelOrderCommand(id);
+            await _cancelOrderHandler.Handle(command);
+
             return Ok();
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var orders = _service.GetAll()
-                    .Select(o => new
-                    {
-                        Id = o.Id,
-                        Total = o.Total.Amount,
-                        Status = o.Status.ToString()
-                    });
-
+            var orders = await _getOrdersHandler.Handle();
             return Ok(orders);
         }
+
     }
 }

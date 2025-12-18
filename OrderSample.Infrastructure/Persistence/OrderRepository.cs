@@ -1,39 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using OrderSample.Application.Orders;
+﻿using OrderSample.Application.Abstractions;
 using OrderSample.Domain.Orders;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Threading.Tasks;
+using OrderSample.Infrastructure.Persistence;
 
-namespace OrderSample.Infrastructure.Persistence
+public class OrderRepository : IOrderRepository
 {
-    public class OrderRepository : IOrderRepository
+    private readonly OrderDbContext _context;
+
+    public OrderRepository(OrderDbContext context)
     {
-        private readonly OrderDbContext _context;
+        _context = context;
+    }
 
-        public OrderRepository(OrderDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<Order?> GetById(Guid id)
+    {
+        return await _context.Orders
+            .SingleOrDefaultAsync(o => o.Id == id);
+    }
 
-        public Order GetById(Guid id)
-        {
-            return _context.Orders.Single(o => o.Id == id);
-        }
+    public async Task Add(Order order)
+    {
+        await _context.Orders.AddAsync(order);
+    }
 
-        public IEnumerable<Order> GetAll()
-        {
-            return _context.Orders.ToList();
-        }
-
-        public void Add(Order order)
-        {
-            _context.Orders.Add(order);
-            _context.SaveChanges();
-        }
-
-        public void Save(Order order)
-        {
-            _context.SaveChanges();
-        }
+    public async Task SaveChanges()
+    {
+        await _context.SaveChangesAsync();
     }
 }

@@ -5,6 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using OrderSample.Application.Commands.Orders.CancelOrder;
+using OrderSample.Application.Commands.Orders.CreateOrder;
+using OrderSample.Application.Abstractions;
+using OrderSample.Infrastructure.Queries.Orders.GetOrders;
 
 namespace OrderSample.Api
 {
@@ -20,16 +24,17 @@ namespace OrderSample.Api
         // Register services
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
-            
-            services.AddScoped<Application.Orders.OrderService>();
-            services.AddScoped<Application.Orders.IOrderRepository,
-                               Infrastructure.Persistence.OrderRepository>();
+            services.AddControllers();            
 
             // DbContext
             services.AddDbContext<OrderSample.Infrastructure.Persistence.OrderDbContext>(
                 options => options.UseInMemoryDatabase("OrdersDb")
             );
+
+            services.AddScoped<CreateOrderCommandHandler>();
+            services.AddScoped<CancelOrderCommandHandler>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<GetOrdersQueryHandler>();
 
             // Swagger
             services.AddSwaggerGen(c =>

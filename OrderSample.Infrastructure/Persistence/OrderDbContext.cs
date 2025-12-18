@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderSample.Domain.Orders;
-
+          
 namespace OrderSample.Infrastructure.Persistence
 {
     public class OrderDbContext : DbContext
