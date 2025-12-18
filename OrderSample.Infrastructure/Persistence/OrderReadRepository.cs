@@ -1,25 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OrderSample.Infrastructure.Persistence;
+using OrderSample.Application.Abstractions;
 using OrderSample.Application.Queries.Orders.GetOrders;
+using OrderSample.Infrastructure.Persistence;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OrderSample.Infrastructure.Queries.Orders.GetOrders
+namespace OrderSample.Infrastructure.Persistence
 {
-    public sealed class GetOrdersQueryHandler
+    public sealed class OrderReadRepository : IOrderReadRepository
     {
         private readonly OrderDbContext _context;
 
-        public GetOrdersQueryHandler(OrderDbContext context)
+        public OrderReadRepository(OrderDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IReadOnlyList<OrderListItemDto>> Handle()
+        public async Task<IReadOnlyList<OrderListItemDto>> GetAll()
         {
             return await _context.Orders
                 .AsNoTracking()
+                .Where(o => o.Status != Domain.Orders.OrderStatus.Cancelled) // opcional
                 .Select(o => new OrderListItemDto(
                     o.Id,
                     o.Total.Amount,

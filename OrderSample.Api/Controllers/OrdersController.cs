@@ -3,7 +3,7 @@ using OrderSample.Application.Commands.Orders.CreateOrder;
 using OrderSample.Application.Commands.Orders.CancelOrder;
 using System;
 using System.Threading.Tasks;
-using OrderSample.Infrastructure.Queries.Orders.GetOrders;
+using OrderSample.Application.Queries.Orders.GetOrders;
 
 namespace OrderSample.Api.Controllers
 {

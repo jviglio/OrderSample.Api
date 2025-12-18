@@ -8,7 +8,8 @@ using Microsoft.OpenApi.Models;
 using OrderSample.Application.Commands.Orders.CancelOrder;
 using OrderSample.Application.Commands.Orders.CreateOrder;
 using OrderSample.Application.Abstractions;
-using OrderSample.Infrastructure.Queries.Orders.GetOrders;
+using OrderSample.Infrastructure.Persistence;
+using OrderSample.Application.Queries.Orders.GetOrders;
 
 namespace OrderSample.Api
 {
@@ -35,6 +36,7 @@ namespace OrderSample.Api
             services.AddScoped<CancelOrderCommandHandler>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<GetOrdersQueryHandler>();
+            services.AddScoped<IOrderReadRepository, OrderReadRepository>();
 
             // Swagger
             services.AddSwaggerGen(c =>
