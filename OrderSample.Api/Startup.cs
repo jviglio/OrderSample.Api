@@ -10,6 +10,10 @@ using OrderSample.Application.Commands.Orders.CreateOrder;
 using OrderSample.Application.Abstractions;
 using OrderSample.Infrastructure.Persistence;
 using OrderSample.Application.Queries.Orders.GetOrders;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System;
 
 namespace OrderSample.Api
 {
@@ -25,7 +29,31 @@ namespace OrderSample.Api
         // Register services
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();            
+            services.AddControllers();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        var jwt = Configuration.GetSection("Jwt");
+
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+
+                            ValidIssuer = jwt["Issuer"],
+                            ValidAudience = jwt["Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(jwt["Key"]!)
+                            ),
+
+                            ClockSkew = TimeSpan.Zero
+                        };
+                    });
+
+            services.AddAuthorization();
 
             // DbContext
             services.AddDbContext<OrderSample.Infrastructure.Persistence.OrderDbContext>(
@@ -46,7 +74,34 @@ namespace OrderSample.Api
                     Title = "OrderSample API",
                     Version = "v1"
                 });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header usando el esquema Bearer.\r\n\r\n" +
+                                  "Ejemplo: \"Bearer {token}\"",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
             });
+
         }
 
 
@@ -75,6 +130,7 @@ namespace OrderSample.Api
             // Routing SIEMPRE antes de endpoints
             app.UseRouting();
 
+            app.UseAuthentication();            
             app.UseAuthorization();
 
             // Endpoints SIEMPRE después de UseRouting

@@ -4,6 +4,7 @@ using OrderSample.Application.Commands.Orders.CancelOrder;
 using System;
 using System.Threading.Tasks;
 using OrderSample.Application.Queries.Orders.GetOrders;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OrderSample.Api.Controllers
 {
@@ -44,6 +45,7 @@ namespace OrderSample.Api.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
