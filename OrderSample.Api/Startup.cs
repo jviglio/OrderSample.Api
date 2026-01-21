@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
+using OrderSample.Infrastructure.Ai;
 
 namespace OrderSample.Api
 {
@@ -101,6 +102,19 @@ namespace OrderSample.Api
         }
     });
             });
+
+
+            var aiSection = Configuration.GetSection("Ai");
+            var baseUrl = aiSection["BaseUrl"] ?? throw new Exception("Ai:BaseUrl missing");
+            var apiKey = aiSection["ApiKey"] ?? throw new Exception("Ai:ApiKey missing");
+            var model = aiSection["Model"] ?? "gpt-4o-mini";
+
+            services.AddHttpClient<IAiClient, OpenAiClient>(http =>
+            {
+                OpenAiClient.ConfigureHttpClient(http, baseUrl, apiKey);
+            });
+
+            services.AddSingleton(model);
 
         }
 
