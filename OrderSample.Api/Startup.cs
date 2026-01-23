@@ -15,6 +15,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using OrderSample.Infrastructure.Ai;
+using OrderSample.Application.Abstractions;
+using OrderSample.Infrastructure.N8n;
 
 namespace OrderSample.Api
 {
@@ -31,6 +33,18 @@ namespace OrderSample.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AngularDev", builder =>
+                {
+                    builder
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();                    
+                });
+            });
+
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
@@ -103,7 +117,6 @@ namespace OrderSample.Api
     });
             });
 
-
             var aiSection = Configuration.GetSection("Ai");
             var baseUrl = aiSection["BaseUrl"] ?? throw new Exception("Ai:BaseUrl missing");
             var apiKey = aiSection["ApiKey"] ?? throw new Exception("Ai:ApiKey missing");
@@ -116,6 +129,10 @@ namespace OrderSample.Api
 
             services.AddSingleton(model);
 
+            services.AddHttpClient<IN8nClient, N8nClient>(c =>
+            {
+                c.BaseAddress = new Uri("https://prototipos.jpvidaldesign.com/");
+            });
         }
 
 
@@ -144,14 +161,15 @@ namespace OrderSample.Api
             // Routing SIEMPRE antes de endpoints
             app.UseRouting();
 
-            app.UseAuthentication();            
+            app.UseCors("AngularDev");
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            // Endpoints SIEMPRE después de UseRouting
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-            });
+            });                        
         }
     }
 }
