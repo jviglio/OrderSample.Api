@@ -15,7 +15,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using OrderSample.Infrastructure.Ai;
-using OrderSample.Application.Abstractions;
 using OrderSample.Infrastructure.N8n;
 
 namespace OrderSample.Api

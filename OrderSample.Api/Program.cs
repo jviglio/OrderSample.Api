@@ -20,6 +20,14 @@ namespace OrderSample.Api
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureKestrel((context, options) =>
+                    {
+                        if (context.HostingEnvironment.IsProduction())
+                        {
+                            options.ListenAnyIP(5000); // 0.0.0.0:5000 en server
+                        }                        
+                    });
+
                     webBuilder.UseStartup<Startup>();
                 });
     }
