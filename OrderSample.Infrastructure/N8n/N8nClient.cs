@@ -21,7 +21,7 @@ namespace OrderSample.Infrastructure.N8n
             var json = JsonSerializer.Serialize(request);
             using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var resp = await _http.PostAsync("webhook/ecommerce", content, ct);
+            var resp = await _http.PostAsync("webhook/agenteinmobiliario", content, ct);
             resp.EnsureSuccessStatusCode();
 
             return await resp.Content.ReadAsStringAsync();
